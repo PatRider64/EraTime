@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserEraTimeRepository::class)]
-class UserEraTime  implements UserInterface, PasswordAuthenticatedUserInterface
+class UserEraTime implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -190,7 +190,8 @@ class UserEraTime  implements UserInterface, PasswordAuthenticatedUserInterface
         return null;
     }
 
-    public function eraseCredentials() {
+    public function eraseCredentials(): void
+    {
 
     }
 
