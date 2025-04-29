@@ -16,7 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
-use App\Entity\UserSysTime;
+use App\Entity\UserEraTime;
 use App\Repository\ParameterRepository;
 use Symfony\Component\Mime\Address;
 use Error;
@@ -171,7 +171,7 @@ class SecurityController extends AbstractController
     {
         $userEmailToUpdate = $email;
         $hashedPassword = "";
-        $user = $this->doctrine->getRepository(UserSysTime::class)->findOneBy(['email' => $userEmailToUpdate]);
+        $user = $this->doctrine->getRepository(UserEraTime::class)->findOneBy(['email' => $userEmailToUpdate]);
         if($user){
             // encode the plain password
             $userTemp = $user->setPassword(

@@ -1,0 +1,771 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Era94 - EraTime - Congés{% endblock %}
+
+{% block body %}
+<section class="content" id="content">
+    <div class="content-inner">
+        <div class="clearfix">
+            <h2 class="page-title">Congés</h2>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="button-group" style="padding-bottom: 10px">
+                    <a href="{{ path('app_holiday', {'year': year, 'monthnb': monthnb, 'section': 'calendar', 'userId': userId}) }}"><button class="btn btn-default">Calendrier</button></a>
+                    <a href="{{ path('app_holiday', {'year': year, 'monthnb': monthnb, 'section': 'holidays', 'userId': userId}) }}"><button class="btn btn-default">Saisie de congés</button></a>
+                </div>
+                <!--<h1 style='color:red'>Maintenance en cours, merci de revenir plus tard</h1>
+                <br>-->
+                <script>
+                    $(function () {
+                        $('.selectAllCheckboxesAdd').click(function()
+                        {
+                            if ($('.form-check-add').is(':checked') && !$('.selectAllCheckboxesAdd').is(':checked')) {
+                                $('.form-check-add').prop('checked', false);
+                            } else {
+                                $('.form-check-add').prop('checked', true);
+                            }
+                        });
+                    });
+                </script>
+                {% if section == 'holidays' %}
+                    <section class="panel" id="holidays">
+                        <header class="panel-heading">
+                            <h3 class="panel-title" id="panel-title">Saisie de congé</h3>
+                        </header>
+                        <div class="panel-body">
+                            <div id="notification" class="alert alert-dismissable fade in">
+                                {% for label, messages in app.flashes %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ label }}" role="alert">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                            <script>
+                                window.addEventListener("load", (event) => {
+                                    $.ajax({
+                                        url: "{{ path('app_users') }}", 
+                                        type: "GET",
+                                        success: function (data) {
+                                            var users = document.getElementById('users');
+                                            data.forEach(user => {
+                                                let opt = document.createElement('option');
+                                                opt.value = user.id;
+                                                opt.textContent += user.name
+                                                if (user.id == {{userId}}) {
+                                                    opt.selected = true;  
+                                                }
+                                                users.appendChild(opt);
+                                            });
+                                        },
+                                        error: function (e) {
+                                            console.log("Erreur lors de la récupération des données : "+e);
+                                        }
+                                    });
+                                });
+
+                                function affichage_form(type) {
+                                    if (type == 'half_day') {
+                                        document.getElementById('holidayTypeHalfDay').style.display = "block";
+                                        document.getElementById('dateStartHalfDay').style.display = "block";
+                                        document.getElementById('halfHolidaySingle').style.display = "block";
+                                        document.getElementById('holidayType').style.display = "none";
+                                        document.getElementById('dateStartOneDay').style.display = "none";
+                                        document.getElementById('dateStartPeriod').style.display = "none";
+                                        document.getElementById('dateEndPeriod').style.display = "none";
+                                    } else if (type == 'one_day') {
+                                        document.getElementById('holidayTypeHalfDay').style.display = "none";
+                                        document.getElementById('dateStartHalfDay').style.display = "none";
+                                        document.getElementById('halfHolidaySingle').style.display = "none";
+                                        document.getElementById('holidayType').style.display = "block";
+                                        document.getElementById('dateStartOneDay').style.display = "block";
+                                        document.getElementById('dateStartPeriod').style.display = "none";
+                                        document.getElementById('dateEndPeriod').style.display = "none";
+                                    } else if (type == 'period') {
+                                        document.getElementById('holidayTypeHalfDay').style.display = "none";
+                                        document.getElementById('dateStartHalfDay').style.display = "none";
+                                        document.getElementById('halfHolidaySingle').style.display = "none";
+                                        document.getElementById('holidayType').style.display = "block";
+                                        document.getElementById('dateStartOneDay').style.display = "none";
+                                        document.getElementById('dateStartPeriod').style.display = "block";
+                                        document.getElementById('dateEndPeriod').style.display = "block";
+                                    }
+                                }
+
+                                function affichage_solde_et_calendrier() {
+                                    var userId = document.getElementById('users').value;
+                                    var nbDays = new Date({{year}}, {{monthnb}}, 0).getDate();
+
+                                    $.ajax({
+                                        url: "{{ path('app_user_id') }}", 
+                                        type: "GET",
+                                        data: {
+                                            id: userId,
+                                            year: {{year}},
+                                            monthnb: {{monthnb}},
+                                            nbDays: nbDays
+                                        },
+                                        success: function (data) {
+                                            //Création du calendrier
+                                            var calendar = document.getElementById('calendar');
+                                            var textDaysName = "";
+                                            var textDaysNumber = "";
+                                            var textDaysType = "";
+                                            var jours = ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"];
+                                            var dayCalendarPeriod = new Date({{year}}, {{monthnb}}-1, 1).getDay();
+
+                                            for (let i = 1; i <= nbDays; i++) {
+                                                textDaysName += "<td bgcolor='#FFFF66'>"+jours[dayCalendarPeriod]+"</td>";
+                                                dayCalendarPeriod++;
+                                                if (dayCalendarPeriod == 7) {
+                                                    dayCalendarPeriod = 0;
+                                                }
+                                                textDaysNumber += "<td bgcolor='#FFFF66'>"+i+"</td>";
+                                                var color = data.days[i].color;
+
+                                                if (data.days[i].half_day == "M") {
+                                                    textDaysType += "<td bgcolor="+data.days[i].color+" style='font-weight: bold; text-align: left'>"+data.days[i].half_day+"</td>";
+                                                } else if (data.days[i].half_day == "A") {
+                                                    textDaysType += "<td bgcolor="+data.days[i].color+" style='font-weight: bold; text-align: right'>"+data.days[i].half_day+"</td>";
+                                                } else {
+                                                    textDaysType += "<td bgcolor="+data.days[i].color+"></td>";
+                                                }
+                                            }
+                                            
+                                            {% set dayCalendarPeriod = day %}
+                                            calendar.innerHTML = "<table class='table table-bordered' id='dataTable'>" +
+                                                "<tr><td bgcolor='#CCCCCC'></td>" + textDaysName +
+                                                "</tr><tr>" +
+                                                    "<td bgcolor='#CCCCCC'></td>" + textDaysNumber +
+                                                "</tr><tr>" +
+                                                    "<td bgcolor='#FFFF66'>" + data.name + " " + data.firstName + "</td>" + textDaysType +
+                                                "</tr>" +
+                                            "</table>";
+                                        },
+                                    });
+                                }
+
+                                function disableHalfHoliday() {
+                                    if (document.getElementById('holidayTypeList').value == 5) {
+                                        document.getElementById('halfHolidayAfternoonStart').disabled = true;
+                                        document.getElementById('halfHolidayAfternoonStart').checked = false;
+                                        document.getElementById('halfHolidayMorningEnd').disabled = true;
+                                        document.getElementById('halfHolidayMorningEnd').checked = false;
+                                    } else {
+                                        document.getElementById('halfHolidayAfternoonStart').disabled = false;
+                                        document.getElementById('halfHolidayMorningEnd').disabled = false;
+                                    }
+                                }
+
+                                function validateForm(typeForm) {
+                                    var userId = document.getElementById('users').value;
+                                    var userName;
+                                    var dateStart;
+                                    var dateEnd;
+                                    var nbDays;
+                                    var type = document.getElementById('holidayTypeList').value;
+                                    var typeName;
+                                    var typeTime = document.querySelector('input[name="time_type"]:checked').value;
+
+                                    $.ajax({
+                                        url: "{{ path('app_user_name') }}", 
+                                        type: "GET",
+                                        async: false,
+                                        data: {
+                                            id: userId
+                                        },
+                                        success: function (data) {
+                                            userName = data;
+                                        },
+                                        error: function (e) {
+                                            console.log("Erreur lors de la récupération des données : "+e);
+                                        }
+                                    });
+
+                                    switch(type) {
+                                        case '1':
+                                            typeName = 'Payé';
+                                            break;
+                                        case '2':
+                                            typeName = 'Maternité';
+                                            break;
+                                        case '3':
+                                            typeName = 'Paternité';
+                                            break;
+                                        case '4':
+                                            typeName = 'Sans solde';
+                                            break;
+                                        case '5':
+                                            typeName = 'Ancienneté';
+                                            break;
+                                        case '6':
+                                            typeName = 'Familial';
+                                            break;
+                                        case '7':
+                                            typeName = 'Maladie';
+                                        break;
+                                        case '9':
+                                            typeName = 'Apprenti';
+                                    }
+
+                                    if (typeTime == 'half_day') {
+                                        dateStart = document.getElementById('dateStartHalfDayInput').value;
+                                        dateEnd = dateStart;
+                                        nbDays = 0.5;
+                                    } else if (typeTime == 'one_day') {
+                                        dateStart = document.getElementById('dateStartOneDayInput').value;
+                                        dateEnd = dateStart;
+                                        nbDays = 1;
+                                    } else if (typeTime == 'period') {
+                                        dateStart = document.getElementById('dateStartPeriodInput').value;
+                                        dateEnd = document.getElementById('dateEndPeriodInput').value;
+                                        var halfHolidayAfternoonStart = document.getElementById('halfHolidayAfternoonStart').checked;
+                                        var halfHolidayMorningEnd = document.getElementById('halfHolidayMorningEnd').checked;
+
+                                        $.ajax({
+                                            url: "{{ path('app_holiday_nb_days') }}", 
+                                            type: "GET",
+                                            async: false,
+                                            data: {
+                                                dateStart: dateStart,
+                                                dateEnd: dateEnd,
+                                                halfHolidayAfternoonStart: halfHolidayAfternoonStart,
+                                                halfHolidayMorningEnd: halfHolidayMorningEnd
+                                            },
+                                            success: function (data) {
+                                                nbDays = data;
+                                            },
+                                            error: function (e) {
+                                                console.log("Erreur lors de la récupération des données : "+e);
+                                            }
+                                        });
+                                    }
+                                    return confirm('Voulez-vous confirmer votre demande ?\nUtilisateur: '+userName+'\nDate de début: '+dateStart+'\nDate de fin: '+dateEnd+'\nNombre de jours: '+nbDays+'\nType de congé: '+typeName);
+                                }
+                            </script>
+                            <div class="row form-group">
+                                {{ form_start(holidayForm, {'attr': {'onsubmit':'return validateForm();'} }) }}
+                                    <div class="form-group col-lg-2" id="timeTypeList">
+                                        {% set arrayValues = [] %}
+                                        {% set arrayValues = arrayValues|merge(['half_day', 'one_day', 'period']) %}
+                                        {% set arrayLabels = [] %}
+                                        {% set arrayLabels = arrayLabels|merge(['Demi-journée', 'Journée seule', 'Période']) %}
+
+                                        {% for i in 0..2 %}
+                                            {% set value = arrayValues[i] %}
+                                            {% set label = arrayLabels[i] %}
+
+                                            {% if i < 2 %}
+                                                <input type="radio" name="time_type" id="{{ value }}" value="{{ value }}"
+                                                onchange="affichage_form('{{ value }}')" style="width:20px; height:20px"/>
+                                                <label for="{{ value }}">{{ label }}</label></br>
+                                            {% else %}
+                                                <input type="radio" name="time_type" id="{{ value }}" value="{{ value }}"
+                                                onchange="affichage_form('{{ value }}')" style="width:20px; height:20px" checked/>
+                                                <label for="{{ value }}">{{ label }}</label></br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div><br><br><br><br><br><br>
+                                    <div class="form-group col-lg-2">
+                                        <label class="form-label required" for='users'>Utilisateur</label>
+                                        <select id='users' name='users' onchange="affichage_solde_et_calendrier()" class='form-control form-select'>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-2" id="holidayTypeHalfDay" style="display:none">
+                                        {{ form_row(holidayForm.typeHalf) }}
+                                    </div>
+                                    <div class="form-group col-lg-2" id="holidayType" onchange="disableHalfHoliday()">
+                                        {{ form_row(holidayForm.type, {'id':'holidayTypeList'}) }}
+                                    </div>
+                                    <div class="form-group col-lg-2" id="dateStartHalfDay" style="display:none">
+				    				    {{ form_row(holidayForm.dateStartHalf, {'id':'dateStartHalfDayInput'}) }}
+				    			    </div>
+                                    <div class="form-group col-lg-1" id="halfHolidaySingle" style="display:none">
+                                        {{ form_row(holidayForm.halfHolidaySingle) }}
+                                    </div>
+                                    <div class="form-group col-lg-2" id="dateStartOneDay" style="display:none">
+				    				    {{ form_row(holidayForm.dateStartOne, {'id':'dateStartOneDayInput'}) }}
+				    			    </div>
+                                    <div class="form-group col-lg-2" id="dateStartPeriod">
+				    				    {{ form_row(holidayForm.dateStartPeriod, {'id':'dateStartPeriodInput'}) }}
+                                        {{ form_row(holidayForm.halfHolidayAfternoonStart, {'id':'halfHolidayAfternoonStart'}) }}
+				    			    </div>
+                                    <div class="form-group col-lg-2" id="dateEndPeriod">
+				    				    {{ form_row(holidayForm.dateEndPeriod, {'id':'dateEndPeriodInput'}) }}
+                                        {{ form_row(holidayForm.halfHolidayMorningEnd, {'id':'halfHolidayMorningEnd'}) }}
+				    			    </div>
+                                    <div class="button-group col-lg-10">
+                                        {{ form_row(holidayForm.cancel) }}
+                                        {{ form_row(holidayForm.submit) }}
+                                    </div>
+                                {{ form_end(holidayForm) }}
+                                <div class="row" id='date'>
+                                    <h2 align="center">
+                                        <span><a href="{{ path('app_holiday', {'year': year, 'monthnb': monthnb - 1, 'section': section, 'userId': userId}) }}"> << </a></span>
+                                        <span> {{month}} {{year}} </span>
+                                        <span><a href="{{ path('app_holiday', {'year': year, 'monthnb': monthnb + 1, 'section': section, 'userId': userId}) }}"> >> </a></span>
+                                    </h2>
+                                </div>
+                                <div align="center" class="col-lg-12" id="calendar">
+                                    <table class="table table-bordered" id="dataTable">
+                                        <tr>
+                                            <td bgcolor="#CCCCCC"></td>
+                                            {% set dayCalendar = day %}
+                                            {% for i in 1..nbCols %}
+                                                <td bgcolor="#FFFF66">{{ jours[dayCalendar] }}</td>
+                                                {% set dayCalendar = dayCalendar + 1 %}
+
+                                                {% if dayCalendar == 7 %}
+                                                    {% set dayCalendar = 0 %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                        <tr>
+                                            <td bgcolor="#CCCCCC"></td>
+                                            {% for i in 1..nbCols %}
+                                                <td bgcolor="#FFFF66">{{i}}</td>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr>
+                                            {% for i in 0..nbCols %}
+                                                {% if i == 0 %}
+                                                    <td bgcolor="#FFFF66">{{ userStart.name }} {{ userStart.firstName }} </td>
+                                                {% else %}
+                                                    {% if i < 10 %}
+                                                        {% set date = "#{year}-#{monthnb}-0#{i} 00:00:00" %}
+                                                    {% else %}
+                                                        {% set date = "#{year}-#{monthnb}-#{i} 00:00:00" %}
+                                                    {% endif %}
+                                                    {% set jour = day(date, year, monthnb, i, userStart.id) %}
+
+                                                    {% if jour[0] == 'ferie' %}
+                                                        <td bgcolor="blue"></td>
+                                                    {% elseif jour[0] == 'weekend' %}
+                                                        <td bgcolor="lightslategray"></td>
+                                                    {% elseif jour[0] == 1 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="#E67E30" style="font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="#E67E30" style="font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="#E67E30"></td>
+                                                        {% endif %}
+                                                    {% elseif jour[0] == 2 or jour[0] == 3 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="green" style="font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="green" style="font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="green"></td>
+                                                        {% endif %}
+                                                    {% elseif jour[0] == 4 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="#463F32" style="font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="#463F32" style="font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="#463F32"></td>
+                                                        {% endif %}
+                                                    {% elseif jour[0] == 5 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="#A10684" style="font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="#A10684" style="font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="#A10684"></td>
+                                                        {% endif %}
+                                                    {% elseif jour[0] == 6 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="#33FFFF" style="font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="#33FFFF" style="font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="#33FFFF"></td>
+                                                        {% endif %}
+                                                    {% elseif jour[0] == 7 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="#BCFF00" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="#BCFF00" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="#BCFF00" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                        {% endif %}
+                                                    {% elseif jour[0] == 8 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="#9933FF" style="position: sticky; top: 158px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="#9933FF" style="position: sticky; top: 158px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="#9933FF" style="position: sticky; top: 158px; z-index: 2;"></td>
+                                                        {% endif %}
+                                                    {% elseif jour[0] == 9 %}
+                                                        {% if jour[1] == 'demi_m' %}
+                                                            <td bgcolor="red" style="position: sticky; top: 158px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                        {% elseif jour[1] == 'demi_a' %}
+                                                            <td bgcolor="red" style="position: sticky; top: 158px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                        {% else %}
+                                                            <td bgcolor="red" style="position: sticky; top: 158px; z-index: 2;"></td>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <td></td>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <table class="table table-bordered" align="center">
+                                <colgroup id="colgroup">
+                                    <col class="t2">
+                                    <col class="t10">
+                                    <col class="t2">
+                                    <col class="t12">
+                                    <col class="t2">
+                                    <col class="t15">
+                                    <col class="t2">
+                                    <col class="t12">
+                                </colgroup>
+                                <tr>
+                                    <td style="background-color: blue"></td>
+                                    <td>
+                                        <div align="left">Férié</div>
+                                    </td>
+                                    <td style="background-color: lightslategray"></td>
+                                    <td>
+                                        <div align="left">Week End</div>
+                                    </td>
+                                    <td style="padding: 0px; padding-top: 8px">
+                                        <div align="center" style="font-weight: bold">A</div>
+                                    </td>
+                                    <td>
+                                        <span>Absence Partielle (Après Midi) </span>
+                                    </td>
+                                    <td style="padding: 0px; padding-top: 8px">
+                                        <div align="center" style="font-weight: bold">M</div>
+                                    </td>
+                                    <td>
+                                        <div align="left">Absence Partielle (Matin)</div>
+                                    </td>
+                                    <td style="background-color:#E67E30;"></td>
+                                    <td>
+                                        <div align="left">Congés Payés</div>
+                                    </td>
+                                    <td style="background-color:#463F32;"></td>
+                                    <td>
+                                        <div align="left">Congés Sans Solde</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color:green;"></td>
+                                    <td>
+                                        <div align="left">Maternité / Paternité</div>
+                                    </td>
+                                    <td style="background-color:#A10684;"></td>
+                                    <td>
+                                        <div align="left">Congés d'Ancienneté</div>
+                                    </td>
+                                    <td style="background-color:#33FFFF;"></td>
+                                    <td>
+                                        <div align="left">Congés Familiaux</div>
+                                    </td>
+                                    <td style="background-color:#BCFF00;"></td>
+                                    <td>
+                                        <div align="left">Congés Maladies</div>
+                                    </td>
+                                    <td style="background-color:#9933FF;"></td>
+                                    <td>
+                                        <div align="left">Jours Home Office</div>
+                                    </td>
+                                    <td style="background-color:red;"></td>
+                                    <td>
+                                        <div align="left">Révision apprenti</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="row form-group">
+                                {{ form_start(holidayUsersForm) }}
+                                    {{ form_label(holidayUsersForm.users) }}
+                                    {{ form_row(holidayUsersForm.selectAll) }} <br>
+                                    <div style="column-count: 4; margin-bottom: 10px">
+                                        {{ form_widget(holidayUsersForm.users) }}
+                                    </div>
+                                    <div class="form-group col-lg-2">
+                                        {{ form_row(holidayUsersForm.type) }}
+                                    </div>
+                                    <div class="form-group col-lg-2">
+				    		    	    {{ form_row(holidayUsersForm.dateStart) }}
+                                        {{ form_row(holidayUsersForm.halfHolidayAfternoonStart) }}
+				    		    	</div>
+                                    <div class="form-group col-lg-2">
+				    		    	    {{ form_row(holidayUsersForm.dateEnd) }}
+                                        {{ form_row(holidayUsersForm.halfHolidayMorningEnd) }}
+				    		    	</div>
+                                    <div class="button-group col-lg-10">
+                                        {{ form_row(holidayUsersForm.cancel) }}
+                                        {{ form_row(holidayUsersForm.submit) }}
+                                    </div>
+                                {{ form_end(holidayUsersForm) }}  
+                            </div>  
+                        </div>
+                        <div class="col-lg-12">
+                            <section class="panel">
+                                <header class="panel-heading">
+                                    <h3 class="panel-title">Liste des congés</h3>
+                                </header>
+                                <div class="table-responsive">
+                                    <table class="table table-stripped table-hover" id="dataTableHolidays">
+                                        <colgroup id="colgroup">
+                                            <col class="t10">
+                                            <col class="t10">
+                                            <col class="t10">
+                                            <col class="t10">
+                                            <col class="t10">
+                                            <col class="t14">
+                                            <col class="t8">
+                                            <col class="t15">
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th{% if table.isSorted('u.name') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(table, 'Identifiant', 'u.name')}}</th>
+                                                <th{% if table.isSorted('h.dateStart') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(table, 'Date de début', 'h.dateStart')}}</th>
+                                                <th{% if table.isSorted('h.dateEnd') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(table, 'Date de fin', 'h.dateEnd')}}</th>
+                                                <th{% if table.isSorted('t.name') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(table, 'Type de congé', 't.name')}}</th>
+                                                <th{% if table.isSorted('h.nbTotalDays') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(table, 'Nombre de jours', 'h.nbTotalDays')}}</th>
+                                                <th{% if table.isSorted('h.dateDemande') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(table, 'Date de la demande', 'h.dateDemande')}}</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for holiday in table %}
+                                                <tr>
+                                                    <td>{{ holiday.users.firstName }} {{ holiday.users.name }}</td>
+                                                    <td>{{ holiday.dateStart|date('d/m/Y') }}</td>
+                                                    <td>{{ holiday.dateEnd|date('d/m/Y') }}</td>
+                                                    <td>{{ holiday.type.name }}</td>
+                                                    <td>{{ holiday.nbTotalDays }}</td>
+                                                    <td>{{ holiday.dateDemande|date('d/m/Y') }}</td>
+                                                    <td><form action="{{ path('app_holiday_delete', {'id': holiday.id, 'status': holiday.status, 'year': year, 'monthnb': monthnb, 'userId': userId}) }}" 
+                                                    method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cette demande?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ holiday.id) }}">
+                                                    <input type="submit" class="btn btn-default" value="Supprimer"></form></td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot id="tfoot">{{ knp_pagination_render(table) }}</tfoot>
+                                        <div class="col-lg-3">
+					        		    	Rechercher :
+					        		    	<form action="{{ path('app_holiday', {'year': year, 'monthnb': monthnb, 'section': 'holidays', 'userId': userId}) }}">
+        			        		    	    <input type="search" name="search" class="form-control" aria-label="Search" value='{{ app.request.get("search") }}'>
+        			        		    	</form>
+					        		    </div>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                {% elseif section == 'calendar' %}    
+                    <section class="panel" id="calendar">
+                        <header class="panel-heading">
+                            <h3 class="panel-title" id="panel-title">Calendrier</h3>
+                        </header>
+                        <div class="col-lg-12" style="position: sticky; top: 60px; z-index: 3; background: white; margin-left: 10px">
+                            <h2 align="center">
+                                <span><a href="{{ path('app_holiday', {'year': year, 'monthnb': monthnb - 1, 'section': section, 'userId': userId}) }}"> << </a></span>
+                                <span> {{month}} {{year}} </span>
+                                <span><a href="{{ path('app_holiday', {'year': year, 'monthnb': monthnb + 1, 'section': section, 'userId': userId}) }}"> >> </a></span>
+                            </h2>
+                        </div>
+                        <div align="center" class="col-lg-12">
+                            <table class="table table-bordered" id="dataTable">
+                                <thead style="position: sticky; top: 95px; z-index: 3">
+                                    <tr>
+                                        <th bgcolor="#CCCCCC"></th>
+                                        {% for i in 1..nbCols %}
+                                            <th bgcolor="#FFFF66">{{ jours[day] }}</th>
+                                            {% set day = day + 1 %}
+                
+                                            {% if day == 7 %}
+                                                {% set day = 0 %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th bgcolor="#CCCCCC"></th>
+                                        {% for i in 1..nbCols %}
+                                            <th bgcolor="#FFFF66">{{i}}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+
+                                {% for user in users %}
+                                    <tr>
+                                        {% for i in 0..nbCols %}
+                                            {% if i == 0 %}
+                                                <td bgcolor="#FFFF66" style="position: sticky; top: 133px; z-index: 2">{{ user.name }} {{ user.firstName }} </td>
+                                            {% else %}
+                                                {% if i < 10 %}
+                                                    {% set date = "#{year}-#{monthnb}-0#{i} 00:00:00" %}
+                                                {% else %}
+                                                    {% set date = "#{year}-#{monthnb}-#{i} 00:00:00" %}
+                                                {% endif %}
+                                                {% set jour = day(date, year, monthnb, i, user.id) %}
+
+                                                {% if jour[0] == 'ferie' %}
+                                                    <td bgcolor="blue" style="position: sticky; top: 133px; z-index: 2"></td>
+                                                {% elseif jour[0] == 'weekend' %}
+                                                    <td bgcolor="lightslategray" style="position: sticky; top: 133px; z-index: 2"></td>
+                                                {% elseif jour[0] == 1 %}
+                                                    {% if jour[1] == 'demi_m' %}
+                                                        <td bgcolor="#E67E30" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                    {% elseif jour[1] == 'demi_a' %}
+                                                        <td bgcolor="#E67E30" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                    {% else %}
+                                                        <td bgcolor="#E67E30" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                    {% endif %}
+                                                {% elseif jour[0] == 2 or jour[0] == 3 %}
+                                                    {% if jour[1] == 'demi_m' %}
+                                                        <td bgcolor="green" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                    {% elseif jour[1] == 'demi_a' %}
+                                                        <td bgcolor="green" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                    {% else %}
+                                                        <td bgcolor="green" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                    {% endif %}
+                                                {% elseif jour[0] == 4 %}
+                                                    {% if jour[1] == 'demi_m' %}
+                                                        <td bgcolor="#463F32" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                    {% elseif jour[1] == 'demi_a' %}
+                                                        <td bgcolor="#463F32" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                    {% else %}
+                                                        <td bgcolor="#463F32" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                    {% endif %}
+                                                {% elseif jour[0] == 5 %}
+                                                    {% if jour[1] == 'demi_m' %}
+                                                        <td bgcolor="#A10684" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                    {% elseif jour[1] == 'demi_a' %}
+                                                        <td bgcolor="#A10684" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                    {% else %}
+                                                        <td bgcolor="#A10684" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                    {% endif %}
+                                                {% elseif jour[0] == 6 %}
+                                                    {% if jour[1] == 'demi_m' %}
+                                                        <td bgcolor="#33FFFF" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                    {% elseif jour[1] == 'demi_a' %}
+                                                        <td bgcolor="#33FFFF" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                    {% else %}
+                                                        <td bgcolor="#33FFFF" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                    {% endif %}
+                                                {% elseif jour[0] == 7 %}
+                                                    {% if jour[1] == 'demi_m' %}
+                                                        <td bgcolor="#BCFF00" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                    {% elseif jour[1] == 'demi_a' %}
+                                                        <td bgcolor="#BCFF00" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                    {% else %}
+                                                        <td bgcolor="#BCFF00" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                    {% endif %}
+                                                {% elseif jour[0] == 8 %}
+                                                    <td bgcolor="#9933FF" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                {% elseif jour[0] == 9 %}
+                                                    {% if jour[1] == 'demi_m' %}
+                                                        <td bgcolor="red" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: left">M</td>
+                                                    {% elseif jour[1] == 'demi_a' %}
+                                                        <td bgcolor="red" style="position: sticky; top: 133px; z-index: 2; font-weight: bold; text-align: right">A</td>
+                                                    {% else %}
+                                                        <td bgcolor="red" style="position: sticky; top: 133px; z-index: 2;"></td>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <td></td>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}    
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            <div class="col-lg-12" style="padding-top: 20px">
+                                <table class="table table-bordered" align="center">
+                                    <colgroup id="colgroup">
+                                        <col class="t2">
+                                        <col class="t10">
+                                        <col class="t2">
+                                        <col class="t15">
+                                        <col class="t2">
+                                        <col class="t15">
+                                        <col class="t2">
+                                        <col class="t15">
+                                        <col class="t2">
+                                        <col class="t10">
+                                        <col class="t2">
+                                        <col class="t10">
+                                    </colgroup>
+                                    <tr>
+                                        <td style="background-color: blue"></td>
+                                        <td>
+                                            <div align="left">Férié</div>
+                                        </td>
+                                        <td style="background-color: lightslategray"></td>
+                                        <td>
+                                            <div align="left">Week End</div>
+                                        </td>
+                                        <td style="padding-left: 0px; padding-right: 0px">
+                                            <div align="center" style="font-weight: bold">A</div>
+                                        </td>
+                                        <td>
+                                            <span>Absence Partielle (Après Midi)</span>
+                                        </td>
+                                        <td style="padding-left: 0px; padding-right: 0px">
+                                            <div align="center" style="font-weight: bold">M</div>
+                                        </td>
+                                        <td>
+                                            <div align="left">Absence Partielle (Matin)</div>
+                                        </td>
+                                        <td style="background-color:#E67E30;"></td>
+                                        <td>
+                                            <div align="left">Congés Payés</div>
+                                        </td>
+                                        <td style="background-color:#463F32;"></td>
+                                        <td>
+                                            <div align="left">Congés Sans Solde</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color:green;"></td>
+                                        <td>
+                                            <div align="left">Maternité / Paternité</div>
+                                        </td>
+                                        <td style="background-color:#A10684;"></td>
+                                        <td>
+                                            <div align="left">Congés d'Ancienneté</div>
+                                        </td>
+                                        <td style="background-color:#33FFFF;"></td>
+                                        <td>
+                                            <div align="left">Congés Familiaux</div>
+                                        </td>
+                                        <td style="background-color:#BCFF00;"></td>
+                                        <td>
+                                            <div align="left">Congés Maladies</div>
+                                        </td>
+                                        <td style="background-color:#9933FF;"></td>
+                                        <td>
+                                            <div align="left">Jours Home Office</div>
+                                        </td>
+                                        <td style="background-color:red;"></td>
+                                        <td>
+                                            <div align="left">Révision apprenti</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+            </div>
+        </div>
+    </div>    
+</section>
+{% endblock %}

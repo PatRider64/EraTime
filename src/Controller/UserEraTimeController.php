@@ -238,4 +238,17 @@ class UserEraTimeController extends AbstractController
         $this->logger->info(json_encode($userName));
         return new JsonResponse($userName);
     }
+
+    #[Route('/users', name: 'app_users')]
+    public function users(UserEraTimeRepository $userRepository) {
+        $users = $userRepository->findAll();
+        $newUser = [];
+
+        foreach ($users as $key => $user) {
+            $newUser[$key]['id'] = $user->getId();
+            $newUser[$key]['name'] = $user->getFirstName().' '.$user->getName();
+        }
+        $this->logger->info(json_encode($newUser));
+        return new JsonResponse($newUser);
+    }
 }

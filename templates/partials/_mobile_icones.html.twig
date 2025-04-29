@@ -5,12 +5,11 @@
             <input type="checkbox" id="mobile" role="button">
             <ul style="padding-left: 0px">
                 <li><a href="{{ path('app_user') }}"><span class="glyphicon glyphicon-user mobile-icon"></span>Personnel</a></li>
-                <li><a href="{{ path('app_holiday') }}"><span class="glyphicon glyphicon-plane mobile-icon"></span>Congés</a></li>
                 {% set date = date('now') %}
                 {% set year = date.format('Y') %}
                 {% set monthnb = date.format('m') %}
-                <li><a href="{{ path('app_home_office', {'year': year, 'monthnb': monthnb}) }}"><span class="bi-house-gear-fill"></span>Home Office</a></li>
-                <li><a href="{{ path('app_calendar', {'year': year, 'monthnb': monthnb}) }}"><span class="glyphicon glyphicon-calendar mobile-icon"></span>Calendrier</a></li>
+                {% set id = id() %}
+                <li class='nav-link'><a href="{{ path('app_holiday', {'year': year, 'monthnb': monthnb, 'section': 'holidays', 'userId': id}) }}" class='nav-link'><span class="glyphicon glyphicon-plane"></span>Congés</a></li>
 
                 {% if 'Support' in app.user.category or 'Administrateur' in app.user.category %}
                     <li><a href="{{ path('app_parameters') }}"><span class="glyphicon glyphicon-wrench"></span>Paramètres</a></li>
