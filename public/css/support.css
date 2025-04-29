@@ -111,7 +111,7 @@
 .faq-title{/*padding-left:15px;padding-right: 15px;*/cursor:pointer;border-width: 2px;border-color: #FFFFFF; border-style:solid;border-radius: 3px}
 /*.main_msgbox{background-color: #D5D8DA;margin:5px;}*/
 .faq-msgbox-odd{background-color: #f8f8f8;margin-left:100px;margin-right:100px;}
-.main_msgbox{background-color: #34495E;color: #FFFFFF;margin:5px;}
+.main_msgbox{background-color: red;color: #FFFFFF;margin:5px;}
 .panel-forum{border-radius:8px;}
 .checkbox-spacing-right{margin-right:15px;}
 .category-list{color: #A0A0A0;}

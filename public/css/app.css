@@ -51,7 +51,7 @@ h2{
     border-right:1px solid #ededed
 }
 .navbar-brand a{
-    color:#34495E
+    color:red
 }
 .navbar-brand a:hover{
     color:inherit
@@ -193,7 +193,7 @@ label.required:not(.form-check-label):after {
     width:100%;
     height:75px;
     text-align:center;
-    background-color:#34495E;
+    background-color:red;
     border-bottom:1px solid #D1D4D7;
     box-shadow:0 0 5px rgba(0,0,0,0.1)
 }
@@ -987,7 +987,7 @@ label.required:not(.form-check-label):after {
     padding-left:120px
 }
 .select2-results .select2-highlighted{
-    background:#34495E;
+    background:red;
     color:#fff
 }
 .select2-results li em{
@@ -1212,13 +1212,13 @@ html[dir="rtl"] .select2-search-choice-close{
 }
 @media (max-width: 767px){
     body{
-        background-color:#34495E
+        background-color:red
     }
     .page--login,.page--forgot-psw{
         background-color:#f5f6f7
     }
     .navbar{
-        background-color:#34495E;
+        background-color:red;
         border:none;
         border-bottom:1px solid #2b3c4e;
         box-shadow:0 0 5px rgba(0,0,0,0.1);
@@ -1247,7 +1247,7 @@ html[dir="rtl"] .select2-search-choice-close{
         color:#f7f7f7
     }
     .navbar-default .navbar-toggle:hover{
-        background-color:#34495E
+        background-color:red
     }
     .navbar-default .navbar-toggle .icon-bar{
         background-color:#f7f7f7
@@ -1258,7 +1258,7 @@ html[dir="rtl"] .select2-search-choice-close{
     }
     .navbar-default .navbar-toggle:focus{
         background-color:#f7f7f7;
-        color:#34495E
+        color:red
     }
     .nav-mobile{
         width: 100%;
@@ -1444,7 +1444,7 @@ html[dir="rtl"] .select2-search-choice-close{
         -ms-transition:width 0.3s ease;
         -o-transition:width 0.3s ease;
         transition:width 0.3s ease;
-        background-color:#34495E
+        background-color:red
     }
     .snap-drawer li{
         border-bottom:1px solid #273747

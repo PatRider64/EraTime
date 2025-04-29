@@ -1,16 +1,19 @@
 <div class="snap-drawers">
     <div class="snap-drawer snap-drawer-left">
-        <nav class="main-menu hidden-xs" style="z-index: 4">
+        <nav class="main-menu main-menu-era94 hidden-xs" style="z-index: 4">
             <ul class="nav">
                 {% if app.user %}
                     <li class='nav-link'><a href="{{ path('app_user') }}" class='nav-link'><span class="glyphicon glyphicon-user"></span>Personnel</a></li>
-
                     <li class='nav-link'><a href="{{ path('app_holiday') }}" class='nav-link'><span class="glyphicon glyphicon-plane"></span>Congés</a></li>
                     {% set date = date('now') %}
                     {% set year = date.format('Y') %}
                     {% set monthnb = date.format('m') %}
                     <li style='height: 66px'><a href="{{ path('app_home_office', {'year': year, 'monthnb': monthnb}) }}" style='height: 66px'><span class="bi-house-gear-fill"></span>Home Office</a></li>
                     <li class='nav-link'><a href="{{ path('app_calendar', {'year': year, 'monthnb': monthnb}) }}" class='nav-link'><span class="glyphicon glyphicon-calendar"></span>Calendrier</a></li>
+
+                    {% if 'Support' in app.user.category or 'Administrateur' in app.user.category %}
+                        <li><a href="{{ path('app_parameters') }}"><span class="glyphicon glyphicon-wrench"></span>Paramètres</a></li>
+                    {% endif %}
                 {% endif %}
             </ul>
         </nav>

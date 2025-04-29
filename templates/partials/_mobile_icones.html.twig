@@ -11,6 +11,10 @@
                 {% set monthnb = date.format('m') %}
                 <li><a href="{{ path('app_home_office', {'year': year, 'monthnb': monthnb}) }}"><span class="bi-house-gear-fill"></span>Home Office</a></li>
                 <li><a href="{{ path('app_calendar', {'year': year, 'monthnb': monthnb}) }}"><span class="glyphicon glyphicon-calendar mobile-icon"></span>Calendrier</a></li>
+
+                {% if 'Support' in app.user.category or 'Administrateur' in app.user.category %}
+                    <li><a href="{{ path('app_parameters') }}"><span class="glyphicon glyphicon-wrench"></span>Paramètres</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>

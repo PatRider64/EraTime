@@ -8,15 +8,22 @@ security:
         users_in_memory: { memory: null }
         user:
             entity:
-                class: 'App\Entity\UserEraTime'
-                property: 'login'
+                class: App\Entity\UserEraTime
+                property: login
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: user
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+            logout:
+                path: app_logout
+            user_checker: App\Security\UserChecker
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -27,8 +34,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/resetpassword, role: PUBLIC_ACCESS }
+        - { path: ^, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
