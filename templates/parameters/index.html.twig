@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Era94 - EraTime - Paramètres{% endblock %}
+
+{% block body %}
+<section class="content" id="content">
+	<div class="content-inner">
+		<div class="clearfix">
+			<h2 class="page-title">Paramètres</h2>
+		</div>
+		<div class="row">
+            <div class="col-lg-12">
+			 	<!--<h1 style='color:red'>Maintenance en cours, merci de revenir plus tard</h1>
+                <br>-->
+				<section class="panel">
+					<div class="panel-body">
+						<div id="notification">
+                            {% for message in app.flashes('success') %}
+								<div class="alert alert-success" role="alert">
+								{{ message }}
+								</div>
+							{% endfor %}
+                        </div>
+                        {{ form_start(parameterForm) }}
+                            <div class="form-group col-lg-3">
+                                {{ form_row(parameterForm.smtp) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(parameterForm.port) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(parameterForm.username) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(parameterForm.password) }}
+                            </div>
+							<div class="form-group col-lg-3">
+                                {{ form_row(parameterForm.expeditorName) }}
+                            </div>
+							<div class="form-group col-lg-3">
+                            	{{ form_row(parameterForm.displayedName) }}
+                            </div>
+							<div class="button-group col-lg-10">
+								{{ form_row(parameterForm.submit) }}
+							</div>
+                        {{ form_end(parameterForm) }}
+                    </div>
+				</section>
+			</div>
+        </div>
+	</div>
+</section>
+{% endblock %}
