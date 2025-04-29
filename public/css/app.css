@@ -71,35 +71,15 @@ h2{
     left:0;
     top:82px;
 }
-.main-menu-syscom{
-    background-color:#2E2760
-}
 .main-menu-era94{
     background-color:#BE1622
-}
-.main-menu-admin{
-    background-color:black
-}
-.button-syscom{
-    background-color:#2E2760;
-    color: white
 }
 .button-era94{
     background-color:#BE1622;
     color: white
 }
-.button-admin{
-    background-color:black;
-    color: white
-}
-.button-syscom:hover{
-    background-color: #7D73C5
-}
 .button-era94:hover{
     background-color: #D06A76
-}
-.button-admin:hover{
-    background-color: #9b9b9b
 }
 .main-menu li a{
     text-align:center;

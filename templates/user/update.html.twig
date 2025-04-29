@@ -1,0 +1,226 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Era94 - EraTime - Personnel{% endblock %}
+
+{% block body %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: "{{ path('app_superiors') }}", 
+            type: "GET",
+            success: function (data) {
+                console.log(data); 
+                var superiors = document.getElementById('superior');
+                var superiors2 = document.getElementById('superior2');
+                var superiors3 = document.getElementById('superior3');
+                $("#superior").empty();
+                $("#superior2").empty();
+                $("#superior3").empty();
+
+                var option = document.createElement('option');
+                option.value = 0;
+                option.textContent = '';
+                superiors.appendChild(option);
+
+                var option2 = document.createElement('option');
+                option2.value = 0;
+                option2.textContent = '';
+                superiors2.appendChild(option2);
+
+                var option3 = document.createElement('option');
+                option3.value = 0;
+                option3.textContent = '';
+                superiors3.appendChild(option3);
+
+                Object.keys(data).forEach(key => {
+                    console.log(data[key]);
+                    let opt = document.createElement('option');
+                    opt.value = data[key].id;
+                    opt.textContent += data[key].name;
+                    {% if user.superior != null %}
+                        if (data[key].id == {{ user.superior.id }}) {
+                            opt.selected = "true";
+                        }
+                    {% endif %}
+                    superiors.appendChild(opt);
+
+                    let opt2 = document.createElement('option');
+                    opt2.value = data[key].id;
+                    opt2.textContent += data[key].name;
+                    {% if user.superior2 != null %}
+                        if (data[key].id == {{ user.superior2.id }}) {
+                            opt2.selected = "true";
+                        }
+                    {% endif %}
+                    superiors2.appendChild(opt2);
+
+                    let opt3 = document.createElement('option');
+                    opt3.value = data[key].id;
+                    opt3.textContent += data[key].name;
+                    {% if user.superior3 != null %}
+                        if (data[key].id == {{ user.superior3.id }}) {
+                            opt3.selected = "true";
+                        }
+                    {% endif %}
+                    superiors3.appendChild(opt3);
+                });
+            },
+            error: function (e) {
+                console.log("Erreur lors de la récupération des données : "+e);
+            }
+        });
+    });
+</script>
+<section class="content" id="content">
+    <div class="content-inner">
+        <div class="clearfix">
+            <h2 class="page-title">Personnel</h2>
+        </div>
+        <div class="row">   
+            <div class="col-lg-12">
+                <section class="panel">
+                    <header class="panel-heading">
+                        <h3 class="panel-title" id="panel-title">Modifier un utilisateur</h3>
+                    </header>
+                    <div class="panel-body">
+                        <div id="notification" class="alert alert-dismissable fade in"></div>
+                            {% for label, messages in app.flashes %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ label }}" role="alert">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        {{ form_start(userUpdateForm) }}
+                            <div class="form-group col-lg-3">
+                                {{ form_row(userUpdateForm.firstName) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(userUpdateForm.name) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(userUpdateForm.email) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(userUpdateForm.login) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(userUpdateForm.phone) }}
+                            </div>
+                            <div class="form-group col-lg-3">
+                                <label class="form-label" for="superior">Supérieur hiérarchique 1</label>
+                                <select id="superior" name="superior" class="form-control form-superior form-select">
+                                    <option value="0"></option>
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-3">
+                                <label class="form-label" for="superior2">Supérieur hiérarchique 2</label>
+                                <select id="superior2" name="superior2" class="form-control form-superior form-select">
+                                    <option value="0"></option>
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-3">
+                                <label class="form-label" for="superior3">Supérieur hiérarchique 3</label>
+                                <select id="superior3" name="superior3" class="form-control form-superior form-select">
+                                    <option value="0"></option>
+                                </select>
+                            </div>
+                            <div class="form-group  col-lg-3">
+                                <br><br><br>
+                            </div>
+                            <div class="form-group col-lg-3">
+                                {{ form_row(userUpdateForm.category) }}
+                            </div>
+                            <div class="button-group col-lg-10">
+                                {{ form_row(userUpdateForm.submit) }}
+                                <a href = "{{ path('app_user') }}"><button class="btn btn-default">Annuler</button></a>
+                            </div>
+                        {{ form_end(userUpdateForm) }}
+                    </div> 
+                </section>
+            </div>
+            <div class="col-lg-12">
+                <section class="panel">
+                    <header class="panel-heading">
+                        <h3 class="panel-title">Liste du personnel</h3>
+                    </header>
+                    <div class="table-responsive">
+                        <table class="table table-stripped table-hover" id="dataTable">
+                            <colgroup id="colgroup">
+                                <col class="t9">
+                                <col class="t9">
+                                <col class="t15">
+                                <col class="t10">
+                                <col class="t10">
+                                <col class="t10">
+                                <col class="t15">
+                                <col class="t10">
+                                <col class="t10">
+                                <col class="t10">
+                                <col class="t5">
+                                <col class="t5">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th{% if users.isSorted('u.name') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Nom', 'u.name')}}</th>
+                                    <th{% if users.isSorted('u.firstName') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Prénom', 'u.firstName')}}</th>
+                                    <th{% if users.isSorted('u.email') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Email', 'u.email')}}</th>
+                                    <th{% if users.isSorted('u.login') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Identifiant', 'u.login')}}</th>
+                                    <th{% if users.isSorted('u.lastActivityDate') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Dernière date d\'activité', 'u.lastActivityDate')}}</th>
+                                    <th{% if users.isSorted('u.phone') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Téléphone', 'u.phone')}}</th>
+                                    <th data-hide="phone">Catégorie</th>
+                                    <th{% if users.isSorted('u.superior.name') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Supérieur 1', 's.name')}}</th>
+                                    <th{% if users.isSorted('u.superior2.name') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Supérieur 2', 's2.name')}}</th>
+                                    <th{% if users.isSorted('u.superior3.name') %} class="sorted" {% endif %} scope="col" class="cursor-pointer" >{{knp_pagination_sortable(users, 'Supérieur 3', 's3.name')}}</th>
+                                    <th class="visible-md visible-lg">Editer</th>
+                                    <th class="visible-md visible-lg">Supprimer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr id = "{{ user.id }}">
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.firstName }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.login }}</td>
+                                        <td>{{ user.lastActivityDate }}</td>
+                                        <td>{{ user.phone }}</td>
+                                        <td>{{ user.category|join(' / ') }}</td>
+                                        <td>
+                                        {% if user.superior != null and user.superior.isActive == true %}
+                                            {{ user.superior.firstName }} {{ user.superior.name }}
+                                        {% endif %}
+                                        </td>
+                                        <td>
+                                        {% if user.superior2 != null and user.superior2.isActive == true %}
+                                            {{ user.superior2.firstName }} {{ user.superior2.name }}
+                                        {% endif %}
+                                        </td>
+                                        <td>
+                                        {% if user.superior3 != null and user.superior3.isActive == true %}
+                                            {{ user.superior3.firstName }} {{ user.superior3.name }}
+                                        {% endif %}
+                                        </td>
+                                        <td class="visible-md visible-lg"><a href = "{{ path('app_user_update', {'id': user.id}) }}">
+                                        <span class="glyphicon glyphicon-pencil"></a></td>
+                                        <td class="visible-md visible-lg"><a href = "{{ path('app_user_delete_api', {'id': user.id}) }}"
+                                        onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?')">
+                                        <span class="glyphicon glyphicon-trash"></a></td>
+                                    </tr>
+                                {% endfor %}    
+                            </tbody>
+                            {{ knp_pagination_render(users) }}
+                            <div class="col-lg-3">
+						    	Rechercher :
+						    	<form action="{{ path('app_user_update', {'id': user.id}) }}">
+    					    	    <input type="search" name="search" class="form-control" aria-label="Search" value='{{ app.request.get("search") }}'>
+    					    	</form>
+						    </div>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>      
+    </div>
+</section>
+{% endblock %}

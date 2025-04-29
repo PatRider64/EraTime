@@ -23,6 +23,54 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <header id="header" style="padding-bottom: 10px">
+            <nav class="navbar navbar-default" role="navigation" style="position: fixed; z-index: 3">
+                {% if is_mobile() %}
+                    <div id="mobileLinks">
+                        {% include 'partials/_mobile_icones.html.twig' %}
+                    </div>
+                {% endif %}
+                <a class="navbar-brand hidden-xs" href=" {{ path('app_home') }}"><img src="{{ asset('images/logo-era94.jpg') }}" class="logo" alt="logo-era94"></a>
+                <h2 class="navbar-text hidden-xs" style="font-size: 16px;">EraTime</h2>
+                <h1 class="navbar-brand visible-xs" href=" {{ path('app_home') }}" style="padding: 0px">Era94 - EraTime</h1>
+                <ul class="nav navbar-nav pull-right hidden-xs" style="margin-right: 10px; margin-top: 15px">
+                   <a style="white-space: normal;" class="nav-link dropdown-toggle align-items-center" type="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                       <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                           <i class="bi bi-person-circle" style="font-size: 16px;"></i>
+                       </div>
+                       {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                           {% if app.user %} {{app.user.firstName}} {{app.user.name}} {% endif %}
+                       {% endif %}
+                   </a>
+                   <ul class="dropdown-menu" style="margin-top: -30px !important;" aria-labelledby="dropdownUser">
+                    </ul>    
+                </ul>
+            </nav>
+        </header>
+        <script>
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    	    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      			return new bootstrap.Tooltip(tooltipTriggerEl)
+    		})
+            window.addEventListener("load", (event) => {
+                $('.pagination a').css("color", "white");
+                $('.pagination span').css("color", "white");
+                $('.pagination a').css("background-color","#BE1622");
+                $('.pagination span').css("background-color", "#D06A76");
+            });
+            function showMobilesIcons() {
+                var x = document.getElementById("mobileLinks");
+                if (x.style.display === "block") {
+                  x.style.display = "none";
+                } else {
+                  x.style.display = "block";
+                }
+            }
+        </script>
+        {% include 'partials/_sidebar.html.twig' %}
+        <div id="content-pane" class="snap-content" {% if is_mobile() %}style="margin-top: 35px"{% else %}style="margin-top: 15px"{% endif %}>
+            {% block body %}
+            {% endblock %}
+        </div>
     </body>
 </html>
